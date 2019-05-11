@@ -1,1 +1,2 @@
-python3 еюх╔ www.wtfuck.net ццвсм╪ф╛╡╒╠ё╢Ф
+О╩©
+python3 Г┬╛Е▌╩ www.wtfuck.net Е╕╧Е╜░Е⌡╬Г┴┤Е╧╤Д©²Е╜≤
