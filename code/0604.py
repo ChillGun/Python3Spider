@@ -27,7 +27,7 @@ def clean(text):
 # 保存地址
 path = 'E:/pic/'
 
-for i in range(1,100):
+for i in range(440,470):
     #以此获取page页的url并获取网页文件
     url = 'https://wtfuck.net/page/'+str(i)+"/"
     page = requests.get(url,headers = Hostreferer)
@@ -46,8 +46,9 @@ for i in range(1,100):
         srcs = p.findall(str(h3))
 
         # 创建文件夹并切换到对应文件夹下面
-        os.makedirs(path + title.strip())
-        os.chdir(path + title.strip())
+        #os.makedirs(path + title.strip())
+        #os.chdir(path + title.strip())
+        os.chdir(path)
 
         # 此处因为 srcs 是 list 格式，但其中只有一个元素，所以使用 srcs[-1] 访问此元素
         print("当前 theme 页 url 为：", srcs[-1])
