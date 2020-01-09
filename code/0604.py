@@ -27,7 +27,7 @@ def clean(text):
 # 保存地址
 path = 'E:/pic/'
 
-for i in range(440,470):
+for i in range(2,100):
     #以此获取page页的url并获取网页文件
     url = 'https://wtfuck.net/page/'+str(i)+"/"
     page = requests.get(url,headers = Hostreferer)
