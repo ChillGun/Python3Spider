@@ -34,7 +34,7 @@ os.chdir(path)
 
 for i in range(2,100):
     #以此获取page页的url并获取网页文件
-    url = 'https://wtfuck.net/page/'+str(i)+"/"
+    url = 'http://www.9999rt.in/html/yazhou/5844_'+str(i)+"/"
     page = requests.get(url,headers = Hostreferer)
     print("当前 Page 页访问结果：",page)
     print("当前 page 页 url 为：", url)

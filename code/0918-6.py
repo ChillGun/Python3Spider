@@ -25,16 +25,16 @@ def clean(text):
     return text
 
 # 保存地址
-path = 'E:/pic8/'
+path = 'E:/20200918下载/pic23/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-for i in range(1,113):
+for i in range(0,12):
     #以此获取page页的url并获取网页文件
-    url = 'http://www.9999rt.in/html/yazhou/8506_'+str(i)+".html"
+    url = 'http://www.9999rt.info/html/yazhou/932_'+str(i)+".html"
     page = requests.get(url,headers = Hostreferer)
     print("当前 Page 页访问结果：",page)
     print("当前 page 页 url 为：", url)
