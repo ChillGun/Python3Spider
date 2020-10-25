@@ -24,17 +24,44 @@ def clean(text):
         text = text.replace(kw,'')
     return text
 
+
+# 图片保存函数，输入图片的url，即可得到图片及图片名
+def get_picture(picture_url):
+    
+    # 尝试下载图片
+    try:
+        picture = requests.get(picture_url,headers = Hostreferer, timeout=(3.05,27))
+        print("当前图片访问状态：",picture.status_code)
+    except requests.exceptions.ConnectTimeout as e:
+        print(e)
+    except requests.exceptions.Timeout as e:
+        print(e)
+    except requests.exceptions.ConnectionError as e:
+        print(e)
+            
+    
+    # 返回图片
+    return picture
+    
+
+
 # 保存地址
-path = 'E:/20200918下载/pic14/'
+path = 'E:/20200918下载/pic26_冰蓝/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-for i in range(1,73):
+page_url = "http://www.9grt.net/html/yazhou/1311"
+page_number = 38   #总页数
+for i in range(1,page_number):
     #以此获取page页的url并获取网页文件
-    url = 'http://www.9999rt.info/html/yazhou/4286_'+str(i)+".html"
+    if i <2:
+        url = page_url+'.html'
+    else:
+        url = page_url+'_'+str(i)+".html"
+    
     page = requests.get(url,headers = Hostreferer)
     print("当前 Page 页访问结果：",page)
     print("当前 page 页 url 为：", url)
@@ -44,24 +71,19 @@ for i in range(1,73):
 
     # 获取 theme 页中的图片 url
     for pic_ in soup_1.select('img'):
-        print("当前图片 url：", pic_['src'])
-        #picture = requests.get(pic_['src'],headers = header)
         
-        try:
-            picture = requests.get(pic_['src'],headers = Hostreferer, timeout=(3.05,27))
-            print(picture.status_code)
-        except requests.exceptions.ConnectTimeout as e:
-            print(e)
-        except requests.exceptions.Timeout as e:
-            print(e)
-        except requests.exceptions.ConnectionError as e:
-            print(e)
+        
             
-        #获取图片名
+        # #获取图片名
         file_name = pic_['src'].split(r'/')[-1]
         file_name = clean(file_name)
 
         #保存图片
-        f = open(file_name,'wb')
-        f.write(picture.content)
-        f.close()
+        if file_name != 'slt.jpg' :
+            print("当前图片 url：", pic_['src'])
+            picture = get_picture(pic_['src'])
+            f = open(file_name,'wb')
+            f.write(picture.content)
+            f.close()
+        
+        
