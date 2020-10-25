@@ -46,16 +46,16 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'E:/20200918下载/pic26_冰蓝/'
+path = 'E:/20200918下载/pic30_秦雪/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-page_url = "http://www.9grt.net/html/yazhou/1311"
-page_number = 38   #总页数
-for i in range(1,page_number):
+page_url = "http://www.9grt.net/html/yazhou/5028"
+page_number = 133   #总页数
+for i in range(132,page_number):
     #以此获取page页的url并获取网页文件
     if i <2:
         url = page_url+'.html'
