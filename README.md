@@ -1,2 +1,2 @@
 ﻿
-python3 爬取 www.wtfuck.net 妹子图片并保存
+python3 爬取爬取网页图片
