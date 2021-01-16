@@ -25,7 +25,7 @@ def clean(text):
     return text
 
 # 保存地址
-path = 'C:/Learn/Python/pic'
+path = 'E:/20200918下载/00/'
 
 for i in range(1,100):
     #以此获取page页的url并获取网页文件
@@ -38,12 +38,22 @@ for i in range(1,100):
     soup = BeautifulSoup(page.text,'lxml')
 
     # 获取每个page页中的theme页src
-    for h3 in soup. select('h3'):
+    pageurls = soup.find_all(class_="entry-title")
+    print(type(pageurls))
+    print(len(pageurls))
+    #print(pageurls[0])
+    
+    #for h2 in soup.select('h2 class="entry-title"'):
+    for i in range(len(pageurls)):
         # 获取 theme 页 src 和 title
-        title = (h3.get_text())
+        h2=pageurls[i]
+        title = (h2.get_text())
         title = clean(title)
         p= re.compile('"(http.*)"')
-        srcs = p.findall(str(h3))
+        print(h2)
+        srcs = p.findall(str(h2))
+        
+
 
         # 创建文件夹并切换到对应文件夹下面
         os.makedirs(path + title.strip())
@@ -74,7 +84,7 @@ for i in range(1,100):
                 print(e)
                 
             #获取图片名
-            file_name = pic_['src'].split(r'/')[-1]
+            file_name = pic_['src'].split(r'/')[-1]+'.jpg'
             file_name = clean(file_name)
 
             #保存图片

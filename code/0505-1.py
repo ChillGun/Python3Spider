@@ -20,7 +20,7 @@ Picreferer = {
 start_html = requests.get(all_url,headers = Hostreferer)
 
 #保存地址
-path = '/home/rqg/mzitu/'
+path = 'E:/20200918下载/00/'
 
 #找寻最大页数
 soup = BeautifulSoup(start_html.text,"html.parser")

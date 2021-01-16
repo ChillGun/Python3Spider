@@ -25,7 +25,7 @@ def clean(text):
     return text
 
 # 保存地址
-path = 'E:/pic/'
+path = 'E:/20200918下载/00/'
 
 for i in range(2,100):
     #以此获取page页的url并获取网页文件
