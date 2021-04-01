@@ -1,4 +1,4 @@
-# coding=utf-8
+# encoding=utf-8
 
 # 导入需要的库
 import os
@@ -47,46 +47,92 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic105_虎小鹤/'
+path = 'G:/FFOutput-1/其它/pic/pic106/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-page_url = "http://www.gogogort.info/html/yazhou/2045"
-page_number = 100   #总页数
-for i in range(0,page_number):
-    #以此获取page页的url并获取网页文件
-    if i <2:
-        url = page_url+'.html'
+theme_url = "http://www.gogogort.info/html/guomosipai/index"
+for j in range (5,98):
+    if j < 2:
+        index_url = theme_url+'.html'
     else:
-        url = page_url+'_'+str(i)+".html"
+        index_url = theme_url+"_"+str(j)+'.html'
     
-    page = requests.get(url,headers = Hostreferer)
-    print("当前 Page 页访问结果：",page)
-    print("当前 page 页 url 为：", url)
+    theme = requests.get(index_url,headers = Hostreferer)
+    theme.encoding="gbk"
+    print("当前 theme 页访问结果：",theme)
+    print("当前 theme 页 url 为：", index_url)
     
+    time.sleep(2)
 
-    # 解析 page 页
-    soup_1 = BeautifulSoup(page.text,'lxml')
-
-    # 获取 theme 页中的图片 url
-    for pic_ in soup_1.select('img'):
-
+    theme_soup = BeautifulSoup(theme.text,'lxml')
+    
+    
+    #提取一个大页中每个主题的URL，一下两种方法均可
+    #for ul in theme_soup.find_all(attrs={'class':'ulPic'}):
+    for ul in theme_soup.find_all(class_='ulPic'):
         
+        for li in ul.find_all(name="li"):
+            #print(li)
             
-        # #获取图片名
-        file_name = pic_['src'].split(r'/')[-1]
-        file_name = clean(file_name)
+            for a in li.select('a'):
+                print(a)
+                print(a.attrs['href'])
 
-        #保存图片
-        if file_name != 'slt.jpg':
-            if file_name != 'nopic_small.gif':
-                print("当前图片 url：", pic_['src'])
-                picture = get_picture(pic_['src'])
-                f = open(file_name,'wb')
-                f.write(picture.content)
-                f.close()
-                #time.sleep(5)
-    #time.sleep(5)    
+                b = a.attrs['href'].split('.')[0]
+                print(b)
+
+
+                page_url = "http://www.gogogort.info"+b
+                #总页数
+                page_number = 200   
+                
+                #获取主题的名字，作为后面的文件夹名
+                page = requests.get(page_url+".html",headers = Hostreferer)
+                page.encoding="gbk"
+                print("当前 Page 页访问结果：",page)
+                print("当前 page 页 url 为：", page_url)
+                soup_1 = BeautifulSoup(page.text,'lxml')
+                page_title = soup_1.find("title")
+                print(page_title.string.split(' - ')[0])
+                print("乱码，为什么,体")
+                # 4月1日，完成到这里，已经可以成功将文件夹名分类出来
+
+
+                for i in range(1,page_number):
+                    #以此获取page页的url并获取网页文件
+                    if i <2:
+                        url = page_url+'.html'
+                    else:
+                        url = page_url+'_'+str(i)+".html"
+                    
+                    page = requests.get(url,headers = Hostreferer)
+                    print("当前 Page 页访问结果：",page)
+                    print("当前 page 页 url 为：", url)
+                    
+
+                    # 解析 page 页
+                    soup_1 = BeautifulSoup(page.text,'lxml')
+
+                    # 获取 theme 页中的图片 url
+                    for pic_ in soup_1.select('img'):
+
+                        
+                            
+                        # #获取图片名
+                        file_name = pic_['src'].split(r'/')[-1]
+                        file_name = clean(file_name)
+
+                        #保存图片
+                        if file_name != 'slt.jpg':
+                            if file_name != 'nopic_small.gif':
+                                print("当前图片 url：", pic_['src'])
+                                picture = get_picture(pic_['src'])
+                                f = open(file_name,'wb')
+                                f.write(picture.content)
+                                f.close()
+                                #time.sleep(5)
+                    #time.sleep(5)    
