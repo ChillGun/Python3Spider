@@ -55,7 +55,7 @@ path = 'G:/FFOutput-1/其它/pic/pic106/'
 os.chdir(path)
 
 theme_url = "http://www.gogogort.info/html/guomosipai/index"
-for j in range (5,98):
+for j in range (1,98):
     if j < 2:
         index_url = theme_url+'.html'
     else:
@@ -70,6 +70,8 @@ for j in range (5,98):
 
     theme_soup = BeautifulSoup(theme.text,'lxml')
     
+    # 创建一个数字作为文件夹的编号
+    folder_number = 0
     
     #提取一个大页中每个主题的URL，一下两种方法均可
     #for ul in theme_soup.find_all(attrs={'class':'ulPic'}):
@@ -97,11 +99,18 @@ for j in range (5,98):
                 print("当前 page 页 url 为：", page_url)
                 soup_1 = BeautifulSoup(page.text,'lxml')
                 page_title = soup_1.find("title")
-                print(page_title.string.split(' - ')[0])
-                print("乱码，为什么,体")
-                # 4月1日，完成到这里，已经可以成功将文件夹名分类出来
+                #print(page_title.string.split(' - ')[0])
+                page_name = clean(page_title.string.split(' - ')[0])
+                print("当前页的主题："+page_name)
 
+                # 文件夹编号+1
+                folder_number = folder_number + 1
 
+                # 创建以主题为名字的文件夹，并切换到该文件夹下面
+                os.makedirs(path + '/' + str(j) + '_' + str(folder_number) +'_'+ page_name)
+                os.chdir(path + '/' + str(j) + '_' + str(folder_number) +'_'+ page_name)
+
+                # 遍历该主题下的每一个页面，并保存图片，因为此处页面数没法确定，所以暂时选择200作为上限
                 for i in range(1,page_number):
                     #以此获取page页的url并获取网页文件
                     if i <2:
@@ -110,8 +119,12 @@ for j in range (5,98):
                         url = page_url+'_'+str(i)+".html"
                     
                     page = requests.get(url,headers = Hostreferer)
-                    print("当前 Page 页访问结果：",page)
                     print("当前 page 页 url 为：", url)
+                    print("当前 Page 页访问结果：",page)
+
+                    if page.status_code==404:
+                        break
+                    
                     
 
                     # 解析 page 页
@@ -135,4 +148,10 @@ for j in range (5,98):
                                 f.write(picture.content)
                                 f.close()
                                 #time.sleep(5)
-                    #time.sleep(5)    
+                    #time.sleep(5)  
+                # 遍历完一个主题，切换至主文件夹 
+                os.chdir(path) 
+            
+
+                
+                    
