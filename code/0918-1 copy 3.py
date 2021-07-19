@@ -15,7 +15,7 @@ header = {
         }
 Hostreferer = {
     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
-    'Referer':'https://diskgirl.com/images/5f6d106a94dbb221944af7e7'
+    'Referer':'http://www.gogogort.com/'
                }
 
 # 文件名处理函数，去掉文件或文件名中不允许的符号
@@ -28,6 +28,7 @@ def clean(text):
 
 # 图片保存函数，输入图片的url，即可得到图片及图片名
 def get_picture(picture_url):
+    
     # 尝试下载图片
     try:
         picture = requests.get(picture_url,headers = Hostreferer, timeout=(3.05,27))
@@ -46,34 +47,41 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic107_diskgirl/06、[XIAOYU语画界] Vol.164 杨晨晨sugar - 眼镜OL与蕾丝吊袜的诱惑/'
+path = 'E:/20200918下载/pic83_国粹花旦戏服/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
+page_url = "https://www.452vls92uggg.com/home/pic/1128067_7.html"
+
+    
+page = requests.get(page_url,headers = Hostreferer)
+print("当前 Page 页访问结果：",page)
+print("当前 page 页 url 为：", page_url)
 
 
-# 保存图片 url
-# for pic_ in soup_1.select('img'):
-for i in range(1,89):
-    pic_url = 'https://diskgirl.com/images/60231289c7b1c1050b9ea709/' + str(i) +'.jpg'
+# 解析 page 页
+soup_1 = BeautifulSoup(page.text,'lxml')
+
+# 获取 theme 页中的图片 url
+for pic_ in soup_1.select('img'):
 
     
         
     # #获取图片名
-    file_name = pic_url.split(r'/')[-1]
+    file_name = pic_['src'].split(r'/')[-1]
     file_name = clean(file_name)
 
     #保存图片
     if file_name != 'slt.jpg':
         if file_name != 'nopic_small.gif':
-            print("当前图片 url：", pic_url)
-            picture = get_picture(pic_url)
+            print("当前图片 url：", pic_['src'])
+            picture = get_picture(pic_['src'])
             f = open(file_name,'wb')
             f.write(picture.content)
             f.close()
-            # time.sleep(5)
+            #time.sleep(5)
 #time.sleep(5)         
         
