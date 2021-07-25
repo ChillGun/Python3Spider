@@ -46,7 +46,7 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic107_diskgirl/06、[XIAOYU语画界] Vol.164 杨晨晨sugar - 眼镜OL与蕾丝吊袜的诱惑/'
+path = 'G:/FFOutput-1/其它/pic/pic107_diskgirl/18、[Minisuka.tv] Ui Mita 三田羽衣 - 高叉诱惑/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
@@ -57,8 +57,8 @@ os.chdir(path)
 
 # 保存图片 url
 # for pic_ in soup_1.select('img'):
-for i in range(1,89):
-    pic_url = 'https://diskgirl.com/images/60231289c7b1c1050b9ea709/' + str(i) +'.jpg'
+for i in range(1,60):
+    pic_url = 'https://diskgirl.com/images/5efa446f1014795de0b686ad/' + str(i) +'.jpg'
 
     
         
