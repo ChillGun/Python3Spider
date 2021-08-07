@@ -29,5 +29,15 @@ def downloadXkcd(startComic, endComic):
             for chunk in res.iter_content(100000):
                 imageFile.write(chunk)
             imageFile.close()
-# TODO: Create and start the Thread objects.
-# TODO: Wait for all threads to end.
+
+# Create and start the Thread objects.
+downloadThreads = []                 # a list of all the Thread objects
+for i in range(0, 1400, 100):        # loops 14 times, creates 14 threads
+    downloadThread = threading.Thread(target=downloadXkcd, args=(i, i + 99))
+    downloadThreads.append(downloadThread)
+    downloadThread.start()
+
+# Wait for all threads to end.
+for downloadThread in downloadThreads:
+    downloadThread.join()
+print('Done.')
