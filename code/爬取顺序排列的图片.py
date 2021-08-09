@@ -46,7 +46,7 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic107_diskgirl/18、[Minisuka.tv] Ui Mita 三田羽衣 - 高叉诱惑/'
+path = 'G:/FFOutput-1/其它/pic/pic108_/05、李子瑶/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
@@ -57,8 +57,11 @@ os.chdir(path)
 
 # 保存图片 url
 # for pic_ in soup_1.select('img'):
-for i in range(1,60):
-    pic_url = 'https://diskgirl.com/images/5efa446f1014795de0b686ad/' + str(i) +'.jpg'
+for i in range(1,68):
+    #图片末尾按1、2、3排列
+    #pic_url = 'https://pic1.hmpicimage.com/meitui/2021/07/21/b03a347e-4d43-403a-aeb6-c71e3915a904/' + str(i) +'.jpg'
+    #图片末尾按001、002、003排列
+    pic_url = 'http://p.99gort.org/uploadfile/2014/1101/05/'+str(i).rjust(2,'0')+'.jpg'
 
     
         

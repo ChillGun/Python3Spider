@@ -39,6 +39,9 @@ def get_picture(picture_url):
         print(e)
     except requests.exceptions.ConnectionError as e:
         print(e)
+    except requests.exceptions.MissingSchema as e:
+        print(e)
+        picture = requests.NullHandler
             
     
     # 返回图片
@@ -47,14 +50,14 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'E:/20200918下载/pic83_国粹花旦戏服/'
+path = 'G:/FFOutput-1/其它/pic/pic108_/04、测试'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-page_url = "https://www.452vls92uggg.com/home/pic/1128067_7.html"
+page_url = "https://www.guomose.top/index.php?s=photo&c=show&id=529"
 
     
 page = requests.get(page_url,headers = Hostreferer)
@@ -79,9 +82,10 @@ for pic_ in soup_1.select('img'):
         if file_name != 'nopic_small.gif':
             print("当前图片 url：", pic_['src'])
             picture = get_picture(pic_['src'])
-            f = open(file_name,'wb')
-            f.write(picture.content)
-            f.close()
+            if picture != requests.NullHandler:
+                f = open(file_name,'wb')
+                f.write(picture.content)
+                f.close()
             #time.sleep(5)
 #time.sleep(5)         
         
