@@ -50,14 +50,14 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic108_/04、测试'
+path = 'G:/FFOutput-1/其它/pic/pic106_XiaoXiao/0908'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-page_url = "https://www.guomose.top/index.php?s=photo&c=show&id=529"
+page_url = "https://bbs4.oil4.xyz/2048/read.php?tid=3889028"
 
     
 page = requests.get(page_url,headers = Hostreferer)
