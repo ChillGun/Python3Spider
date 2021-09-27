@@ -105,25 +105,197 @@ set可以视为一组key的集合，在set中没有重复的key。
 
 通过remove(key)方法删除元素
 
-数据类型转换
+### 数据类型转换
 
 ## 函数
 
 ### 定义函数
 
+```python
+def my_abs(x):
+    if x>0:
+        return x
+    else:
+        return -x
+```
+
+空函数
+
+```python
+def nop():
+    pass
+```
+
+参数检查
+
+```python
+def my_abs(x):
+    if not ininstance(x,(int,float)):
+        raise TypeError('bad operand type')
+    if x>0:
+        return x
+    else:
+        return -x
+```
+
+返回多个值
+
+```python
+import math
+
+def move(x,y,step,angle=0):
+    nx = x + step*math.cos(angle)
+    ny = y + step.math.sin(angle)
+    return nx, ny
+```
+
+此时返回值是一个tuple，但在语法上返回一个tuple可以省略括号，而多个变量可以同时接收一个tuple，按位置赋给对应的值。
+
+```python
+>>>x,y = move(100,100,60,math.pi/6)
+```
+
 ### 函数的参数
 
 #### 位置参数
 
+```python
+def power(x,n):
+    s = 1
+    while n > 0:
+        n = n - 1
+        s = s * x
+    return s
+```
+
+x和n，都是位置参数，调用函数时，传入的两个值按照位置顺序依次赋给参数x和n。
+
 #### 默认参数
+
+```python
+def enroll(name, gender, age=6, city='ChongQing'):
+    print('name:', name)
+    print('gender:', gender)
+    print('age:', age)
+    print('city:', city)
+```
+
+大多数学生只需提供必须的两个参数
+
+```python
+>>>enroll('Sarah','F')
+name:Sarah
+gender:F
+age:6
+City:ChongQing
+```
+
+只有与默认参数不符的学生才需提供额外信息
+
+```python
+enroll('Bob','M',7)
+enroll('Adam','M',city="ChengDu")
+```
+
+定义默认参数要注意：默认参数必须指向不可变对象！
 
 #### 可变参数
 
+```python
+def calc(*numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+```
+
+可变参数允许传入0个或任意个参数，这些可变参数在函数调用时自动组装为一个tuple。
+
+```python
+>>>calc(1,2)
+5
+>>>calc()
+0
+```
+
+也可以把list或tuple前加一个*号，把list或tuple的元素变为可变参数
+
+```python
+>>>nums = [1,2,3]
+>>>calc(*nums)
+14
+```
+
 #### 关键字参数
+
+关键字参数允许传入0个或任意个含参数名的参数，这些关键字参数在函数内部自动组装为一个dict。
+
+```python
+def person(name,age,**kw):
+    print('name:',name,'age:',age,'other:'kw)
+```
+
+使用
+
+```python
+>>>person('Adam',45,gender='M',Job='Engineer')
+name:Adam age:45 other:{'gender':'M','job':'Engineer'}
+```
+
+也可在dict前加**，将dict中所有的key-value用关键字参数传入到函数的kw参数中。
+
+```python
+>>>extra = {'city':'ChongQing','job':'Engineer'}
+>>>person('jack',24,**extra)
+name:Jack age:24 other:{'city':'ChongQing','job':'Engineer'}
+```
+
+
 
 #### 命名关键字参数
 
+要限制关键字参数的名字，就可以用命名关键字参数，例如，只接受city和job作为关键字参数。定义如下：
+
+```python
+def person(name, age, *, city, job):
+    print(name, age, city, job)
+```
+
+*后面的参数被视为命名关键字参数。
+
+如果函数定义中已经有一个可变参数，后面跟着的命名关键字参数就不再需要一个特殊分隔符*了：
+
+```python
+def person(name, age, *args, city, job):
+    print(name, age, args, city, job)
+```
+
+命名关键字参数必须传入参数名。
+
+命名关键字参数可以有缺省值，从而简化调用：
+
+```python
+def person(name, age, *, city='ChongQing', job):
+	print(name, age, city, job)
+>>>person('jack', 24, job='Engineer')
+Jack 24 ChongQing Engineer
+```
+
+
+
 #### 参数组合
+
+在Python中定义函数，可以用必选参数、默认参数、可变参数、关键字参数和命名关键字参数，这5种参数都可以组合使用。但需注意，参数定义的顺序必须是：必选参数、默认参数、可变参数、命名关键字参数和关键字参数。
+
+```python
+def f1(a, b, c=0, *args, **kw):
+    print('a=', a, 'b=', b, 'c=', c, 'args =', args, 'kw=', kw)
+
+def f2(a, b, c=0, *, d, **kw):
+    print('a=', a, 'b=', b, 'c=', c, 'd=', d, 'kw=', kw)
+```
+
+对于任意函数，都可以通过类似func(*args, **kw)的形式调用它，无论它的参数是如何定义的。
 
 ### 递归函数
 

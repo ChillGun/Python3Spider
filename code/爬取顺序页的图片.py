@@ -47,15 +47,15 @@ def get_picture(picture_url):
 
 
 # 保存地址
-path = 'G:/FFOutput-1/其它/pic/pic107_diskgirl/20、乐儿/'
+path = 'G:/FFOutput-1/其它/pic/pic108_/07、国模左曦/'
 
 # 创建文件夹并切换到对应文件夹下面
 #os.makedirs(path + title.strip())
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-page_url = "http://www.99gort.org/html/yazhou/6265"
-page_number = 84   #总页数
+page_url = "http://www.99gort.cc/html/yazhou/6530"
+page_number = 46   #总页数
 for i in range(1,page_number):
     #以此获取page页的url并获取网页文件
     if i <2:

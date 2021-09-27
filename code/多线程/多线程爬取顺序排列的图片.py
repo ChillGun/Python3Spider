@@ -44,7 +44,7 @@ def get_picture(picture_url):
     return picture
 
 # 设置保存地址并切换到该地址
-path = 'G:/FFOutput-1/其它/pic/pic108_/06、晶晶/'
+path = 'G:/FFOutput-1/其它/pic/pic108_/10、杨陈婕/03/'
 os.chdir(path)
 
 def downpic(startPic, endPic):
@@ -52,7 +52,7 @@ def downpic(startPic, endPic):
         #图片末尾按1、2、3排列
         #pic_url = 'https://pic1.hmpicimage.com/meitui/2021/07/21/b03a347e-4d43-403a-aeb6-c71e3915a904/' + str(i) +'.jpg'
         #图片末尾按001、002、003排列
-        pic_url = 'http://p.99gort.in/uploadfile/2017/0921/06/'+str(i).rjust(2,'0')+'.jpg'
+        pic_url = 'http://p.99gort.cc/uploadfile/2014/0717/08/'+str(i).rjust(1,'0')+'.jpg'
 
         
             
@@ -74,7 +74,7 @@ def downpic(startPic, endPic):
 
 # 使用多线程下载
 downloadThreads = []                 
-for i in range(1, 100, 10):        # 定义图片的起始和终止编号，以及每个线程处理几张图片
+for i in range(1, 36, 10):        # 定义图片的起始和终止编号，以及每个线程处理几张图片
     downloadThread = threading.Thread(target=downpic, args=(i, i + 9))
     downloadThreads.append(downloadThread)
     downloadThread.start()
