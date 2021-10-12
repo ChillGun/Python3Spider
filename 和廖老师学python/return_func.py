@@ -9,7 +9,7 @@
 #     return counter
 
 # def createCounter():
-#     L=[0]   #初始化列表L为0
+#     L=[0]   #初始化列表L只有一个元素0
 #     def counter():
 #         L[0]+=1     #L[0]指的是列表L的第一个元素，为一个可变变量
 #         return L[0]
