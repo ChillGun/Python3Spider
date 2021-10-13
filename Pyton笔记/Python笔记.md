@@ -1234,3 +1234,395 @@ func2()
 ```
 
 #### 偏函数
+
+`functools.partial`的作用是，把一个函数的某些参数给固定住（也就是设置默认值），返回一个新函数，调用这个新函数会更简单。
+
+定义一个转换二进制字符串的函数：
+
+```python
+def int2(x, base=2):
+    return int(x, base)
+```
+
+使用`functool.partial`可以直接使用下面的代码创建一个新的函数`int2`：
+
+```python
+>>>import functools
+>>>int2 = functools.partial(int, base=2)
+>>>int2('1000000')
+64
+>>>int2('1010101')
+85
+```
+
+创建偏函数时，实际上可以接收函数对象、`*args`和`**kw`这三个参数，
+
+```python
+int2 = functools.partial(int, base=2)
+int2('10010')
+```
+
+相当于：
+
+```python
+kw = {base: 2}
+int('10010',**kw)
+```
+
+区分
+
+```python
+max2 = functools.partial(max, 10)
+max2(5, 6, 7)
+```
+
+相当于
+
+```python
+args = (10, 5, 6, 7)
+max(*args)
+```
+
+结果为`10`。
+
+## 模块
+
+为了编写可维护的代码，我们把很多函数分组，分别放在不同的文件里，这样，每个文件包含的代码就相对较少，，很多编程语言都采用这种组织代码的方式。在Python中，一个`.py`文件就称之为一个模块（Module）。
+
+使用模块的好处：
+
+1、提高代码的可维护性。
+
+2、避免函数名和变量名冲突。
+
+为了避免模块名的冲突，Python又引入了按目录来组织模块的方法，称为包（Package）。
+
+引入了包以后，只要顶层的包名不与别人冲突，那所用的模块都不会与别人冲突。如`mycompany`包下面有`abc.py`模块，那`abc.py`的名字就变成了`mycompany.abc`。
+
+需要注意，每个包目录下面都有一个`__init__.py`的文件，这个文件表示该目标表示一个包（Package），没有该文件则表示一个普通目录。`__init__.py`可以是空文件，也可以是Python代码，因为`__init__.py`本身就是一个模块，它的模块名与包名相同。
+
+### 使用模块
+
+以`sys`模块为例，编写一个`hello`模块：
+
+```python
+#！/usr/bin/enw python
+# -*- coding: utf-8 -*-
+
+'a test module'
+
+__author__='Michael Liao'
+
+import sys
+
+def test():
+    args = sys.argv # argv变量，用list存储了命令行的所有参数。
+    if len(args)==1:
+        print 'hello, world!'
+    elif len(args)==2:
+        print 'Hello, %s' % srgs[1]
+    else:
+        print 'Too may arguments!'
+
+if __name__=='__main__':
+    test()
+```
+
+第一行注释让这个`hello.py`文件可直接在Unix/Linux/Mac上运行；
+
+第二行表示该文件本身使用UTF-8编码；
+
+第四行是一个字符串，表示模块的文档注释；
+
+`__author__`变量表示作者
+
+```python
+import sys
+```
+
+表示导入`sys`模块，导入该模块就有了变量`sys`指向该模块，以用`sys`这个变量，就可以访问`sys`模块的全部功能。
+
+注意最后两行代码：
+
+```python
+if __name__=='__main__':
+    test()
+```
+
+当在命令行运行`hello`模块文件时，Python解释器把一个特殊变量`__name__`置为`__main__`，而在其它地方导入该`hello`模块时，`if`判断将失败，因此，这种`if`测试可以让一个模块通过命令行运行时执行一些额外的代码，最常见的就是运行测试。
+
+#### 别名
+
+导入模块时，使用别名，可以在运行时根据当前环境选择最合适的模块。
+
+`StringIO`和`cStringIO`，这两个库的接口和功能是一样的，但有些平台不支持`cStringIO`，为提高代码通用性，可如下实现：
+
+```python
+try:
+    import cStringIO as StringIO
+except ImportError: # 导入失败会捕获到ImportError
+    import StringIO
+```
+
+`simplejson`库，在Python2.6之前是独立的第三方库，从2.6开始内置，可以这样写：
+
+```python
+try:
+    import json #python >= 2.6
+except ImportError:
+    import simplejson as json #python <= 2.5
+```
+
+#### 作用域
+
+正常的函数和变量名是公开的（public），可以被直接引用。
+
+类似`__xxx__`这样的变量是特殊变量，可以被直接引用，但是有特殊用途，比如上面的`__author__`，`__name__`就是特殊变量，自己定义变量时不要使用这种变量。
+
+类似`_xxx`和`__xxx`这样的函数或者变量时非公开的（private），不应该被直接引用，但是Python并没有一种方法可以完全限制访问private函数或变量，但是，从编程习惯上不应该引用private函数或变量。
+
+## 面向对象编程
+
+面向对象编程——Object Oriented Programming，简称OOP，是一种程系设计思想。
+
+面向过程的程序设计把计算机程序视为一些列命令的集合，即一组函数顺序执行。为了简化程序设计，面向过程继续把函数切分为子函数，即把大块函数通过切割成小块函数来降低系统复杂度。
+
+面向对象的程序设计把计算机程序视为一组对象的集合，每个对象都可以接收其它对象发过来的消息，并处理这些消息，计算机程序的执行就是一系列消息在各个对象之间的传递。
+
+### 类和实例
+
+类（Class）是抽象的模板，比如Student类；
+
+实例（Instance）是根据类创建出来的一个个具体的“对象”，每个对象都拥有相同的方法，但各自的数据可能不同。
+
+类的定义通过关键字`class`实现：
+
+```python
+class Student(object):
+    pass
+```
+
+`class`后面紧接着类名，即`student`，类名通常用大写字母开头，紧接着括号内表示该类从哪个类继承而来，所有的类都会继承`object`类。
+
+定义类的时候，通过定义一个特殊的`__init__`方法，在创建实例的时候，把所需的属性绑定上去。
+
+```python
+class Student(object):
+    
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+```
+
+有了`__init__`方法，在创建实例的时候，就需要传入相应的参数了，其中`self`不用传，Python解释器会自己把实例变量传进去。
+
+```python
+>>>bart = Student('Bart Simpson', 59)
+>>>bart.name
+'Bart Simpson'
+>>>bart.score
+59
+```
+
+#### 数据封装
+
+面向对象编程的一个种要特点就是数据封装。
+
+```python
+class Student(object):
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+        
+    def print_score(self):
+        print '%s: %s' % (self.name, self,score)
+```
+
+```python
+>>>bart.print_score()
+Bart Simpson: 59
+```
+
+利用如上类创建实例只需要给出`name`和`score`，而如何打印，都在`Student`类的内部定义好了，这些数据和逻辑都被“封装”起来了，调用很容易，但却不知道内部实现的细节。
+
+封装的另外一个好处是可以给`Student`类增加新的方法，比如`get_grade`：
+
+```python
+class Student(object):
+    ...
+    
+    def get_grade(self):
+        if self.score >= 90:
+            return 'A'
+        elif self.score >=60:
+            return 'B'
+        else:
+            return 'C'
+```
+
+```python
+>>>bart.get_grade()
+'C'
+```
+
+类是创建实例的模板，而实例则是一个一个具体的对象，各个实例拥有的数据都互相独立，
+互不影响；
+
+方法就是与实例绑定的函数，和普通函数不同，方法可以直接访问实例的数据；
+
+通过在实例上调用方法，我们就直接操作了对象内部的数据，但无需知道方法内部的实现
+细节。
+
+和静态语言不同，Python 允许对实例变量绑定任何数据。
+
+### 访问限制
+
+Python中，在属性变量名前加两个下划线`__`，就表示该变量变成了一个私有变量（private），只有内部可以访问，外部不能访问。
+
+```python
+class Student(object):
+    def __init__(self, name, score):
+        self.__name = name
+        self.__score = score
+        
+    def print_score(self):
+        print '%s: %s' % (self.__name, self.__score)
+```
+
+为了从外部获取name和score，可以给Student类增加`get_name`和`get_score`这样的方法：
+
+```python
+class Student(object):
+    ...
+    def get_name(self):
+        return self.__name
+    def get_score(self):
+        return self.__score
+```
+
+要从外部修改score，可以给Student类增加`set_score`方法：
+
+```python
+class Student(object):
+    ...
+    
+    def set_score(self, score):
+        self.__score = score
+```
+
+还可以在方法中，对传入的参数进行检查：
+
+```python
+class Student(object):
+    ...
+    
+    def set_score(self, score):
+        if 0 <= score <=100:
+            self.__score = score
+        else：
+        	raise ValueError('bad score')
+```
+
+Python实现私有变量是通过解释器把带双下划线的变量名改成其它变量名实现的。
+
+### 继承和多态
+
+在OOP程序设计中，当我们定义一个class的时候，可以冲某个现有的calss继承，新的class称为子类（Subclass），而被继承的class称为基类、父类或超类（Base class、Super class）。
+
+子类可获得全部功能。
+
+子类和父类都存在相同的方法时，子类的方法会覆盖父类的方法，运行代码时，总是会调用子类的方法。这就是继承的另一个好处：多态。
+
+### 获取对象信息
+
+#### 使用type()
+
+基本类型都可以用`type()`判断对象类型：
+
+```python
+>>> type(123)
+<class 'int'>
+>>> type('str')
+<class 'str'>
+>>> type(None)
+<class 'NoneType'>
+```
+
+如果一个变量指向函数或者类，也可以用`type()`判断：
+
+```python
+>>> type(abs)
+<class 'builtin_function_or_method'>
+```
+
+Python把每种type定义好了常量，放在`types`模块里，使用之前，需要先导入：
+
+```python
+>>> import types
+>>> type('abc')==types.StringType
+True
+>>> type(u'abc')==types.UnicodeType
+True
+>>> type([])==types.ListType
+True
+>>> type(str)==types.TypeType
+True
+```
+
+#### 使用isinstance()
+
+```python
+>>> type(u'abc')==types.UnicodeType
+True
+>>> type([])==types.ListType
+True
+>>> type(str)==types.TypeType
+True
+```
+
+#### 使用dir()
+
+`dir()`函数可获得一个对象的所有属性和方法，返回一个包含字符串的list。
+
+```python
+>>> dir('ABC')
+['__add__', '__class__', '__contains__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getnewargs__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__mod__', '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__rmod__', '__rmul__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'capitalize', 'casefold', 'center', 'count', 'encode', 'endswith', 'expandtabs', 'find', 'format', 'format_map', 'index', 'isalnum', 'isalpha', 'isascii', 'isdecimal', 'isdigit', 'isidentifier', 'islower', 'isnumeric', 'isprintable', 'isspace', 'istitle', 'isupper', 'join', 'ljust', 'lower', 'lstrip', 'maketrans', 'partition', 'replace', 'rfind', 'rindex', 'rjust', 'rpartition', 'rsplit', 'rstrip', 'split', 'splitlines', 'startswith', 'strip', 'swapcase', 'title', 'translate', 'upper', 'zfill']
+```
+
+类似`__xxx__`的属性和方法在python中都是有特殊用途的，比如`__len__`方法返回长度，在Python中，如果调用`len()`函数试图获取一个对象的长度，实际上，在`len()`函数内部，它自动去调用该对象的`__len__()`方法，所以，下面的代码是等价的：
+
+```python
+>>> len('ABC')
+3
+>>> 'ABC'.__len__()
+3
+```
+
+
+
+## 面向对象高级编程
+
+### 使用`__slots__`
+
+`__slots__`的作用是限制class实例能添加的属性：
+
+```python
+class Student(object):
+    __slots__ = ('name', 'age') #用tuple定义运行绑定的属性名称
+```
+
+使用
+
+```python
+>>>s = Student() #创建新的实例
+>>>s.name = 'Michael' #绑定属性‘name’
+>>>s.age = '25' #绑定属性‘age’
+>>> s.score = 99 # 绑定属性'score'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'Student' object has no attribute 'score'
+```
+
+`__slots__`定义的属性仅对当前类实例起作用，对继承的子类不起作用。
+
+除非子类中也定义`__slots__`，这样，子类实例运行定义的属性就是自生的`__slots__`加上父类的`__slots__`。
