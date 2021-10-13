@@ -1626,3 +1626,39 @@ AttributeError: 'Student' object has no attribute 'score'
 `__slots__`定义的属性仅对当前类实例起作用，对继承的子类不起作用。
 
 除非子类中也定义`__slots__`，这样，子类实例运行定义的属性就是自生的`__slots__`加上父类的`__slots__`。
+
+### 使用@property
+
+Python内置的`@property`装饰器负责把一个方法变成属性调用：
+
+```python
+class Student(object):
+    
+    @property
+    def score(self):
+        return self._score
+    
+    @score.setter
+    def score(self, value):
+        if not isinstance(value, int):
+            raise ValueError('score must be an integer!')
+        if value < 0 or value > 100:
+            raise ValueError('score must between 0~100!')
+        self._score = value
+```
+
+`@property`把一个getter方法变成了属性，同时，`@property`本身又创建了另一个装饰器`@score.setter`，负责把一个setter方法百年城属性赋值。
+
+```python
+>>>s = Student()
+>>>s.score = 60 # OK，实际转化为s.set_score(60)
+>>>s.score # OK，实际转化为s.get_score()
+60
+>>>s.score = 90
+Traceback (most recent call last):
+  ...
+ValueError: score must between 0 ~ 100!
+```
+
+需要注意：属性的方法名不要和实例变量重名。注意上面的`score`和`_score`的区分。
+
