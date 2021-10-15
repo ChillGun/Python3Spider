@@ -1662,3 +1662,257 @@ ValueError: score must between 0 ~ 100!
 
 需要注意：属性的方法名不要和实例变量重名。注意上面的`score`和`_score`的区分。
 
+### 多重继承
+
+定义哺乳类和鸟类
+
+```python
+class Animal(object):
+    pass
+
+class Mammal(Animal):
+    pass
+
+class Bird(Amimal):
+    pass
+```
+
+定义`Runnable`和`Flyable`类：
+
+```python
+class Runnable(object):
+    def run(self):
+        print('Running...')
+        
+class Flyable(object):
+    def fly(self):
+        print('Flying...')
+```
+
+定义一个`Runnable`的哺乳动物，例如`Dog`:
+
+```python
+class Dog(Mammal, Runnable):
+    pass
+```
+
+定义一个`Flyable`的哺乳动物，例如`Bat`：
+
+```python
+class Bat(Mammal, Flyable):
+    pass
+```
+
+#### Mixin
+
+在设计继承关系时，如果要“混入”额外的功能，通过多重继承就可以实现。这种设计同城称之为Mixin
+
+为了更好地看出继承关系，把`Runnable`和`Flyable`改为`RunnableMixin`和`FlyableMixin`。还可以定义肉食动物`CarnivorousMixin`和植食动物`HerbivoresMixin`，让某个动物同时拥有好几个Mixin：
+
+```python
+class Dog(Mammal, RunnableMixin, CarnovorousMixin):
+    pass
+```
+
+  在设计类的时候，优先考虑通过多重继承来组合多个Mixin的功能，而不是设计多层次的复杂的继承关系。
+
+例如，一个多进程模式的TCP服务：
+
+```python
+class MyTCPServer(TCPServer, ForkingMixin):
+    pass
+```
+
+一个多进程的UPD服务：
+
+```python
+class MyUDPServer(UDPServer, ThreadingMixin):
+    pass
+```
+
+只允许单一继承的语言（如Java）不能使用Mixin的设计。
+
+### 定制类
+
+类似`__slots__`这种形如`__xxx__`的变量或者函数名就要注意，这些在Python中有特殊用途的。
+
+#### `__str__`
+
+定义好`__str__()`方法，返回一个好看的字符串：
+
+```python
+>>> class Student(object):
+... def __init__(self, name):
+... self.name = name
+... def __str__(self):
+... return 'Student object (name: %s)' % self.name
+...
+>>> print Student('Michael')
+Student object (name: Michael)
+```
+
+`__repr__()`返回程序开发者看到的字符串。可以如下写：
+
+```python
+__repr__ = __str__
+```
+
+
+
+#### `__iter__`
+
+如果一个类想被用于`for...in`循环，类似list和tuple那样，就必须实现一个`__iter__()`方法，该方法返回一个迭代对象，然后，Python的for循环就会不断调用该迭代对象的`next()`方法拿到循环的下一个值，直到遇到StopIteration错误时退出循环。
+
+以斐波那契数列为例，写一个Fib类，可以作用域for循环：
+
+```python
+class Fib(object):
+    def __init__(self):
+        self.a, self.b = 0, 1 # 初始化两个计数器a, b
+        
+    def __iter__(self):
+        return self # 实例本身就是迭代对象，故返回自己
+    
+    def next(self):
+        self.a, self.b = self.b, self.a + self.b 
+        if self.a > 100000: # 退出循环的条件
+            raise StopIteration()
+        return self.a # 返回下一个值
+```
+
+现在，试试吧Fib实例作用于for循环：
+
+```python
+>>> for n in Fib():
+... print n
+...
+1
+1
+2
+3
+5
+...
+46368
+75025
+```
+
+#### `__getitem__`
+
+定义一个类，使其表现得像list那样能获取元素和切片，需要实现`__getitem__()`方法：
+
+```python
+class Fib(object):
+    def __getitem__(self, n):
+        if isinstance(n, int):
+            a, b = 1, 1
+            for x in range(n):
+                a, b = b, a + b
+            return a
+        if isinstance(n, slice):
+            start = n.start
+            stop = n.stop
+            a, b = 1, 1
+            L =  []
+            for x in range(stop):
+                if x >= start:
+                    L.append(a)
+                a, b = b, a + b
+            return L
+```
+
+上述定义还没有对负数做处理，所以，要正确实现一个`__getitem__()`还要许多工作要做。
+
+#### `__getattr__`
+
+定义`__getattr__`可以把一个类的所有属性和方法调用全部动态化处理，不需要任何特殊手段。
+
+可以针对完全动态的情况做调用。
+
+比如：
+
+现在很多网站都高REST API，比如新浪微博、豆瓣...，调用的API的URL类似：
+
+```apl
+http://api.server/user/friends
+http://api.server/user/timeline/list
+```
+
+如果要写SDK，给每个URL对应的API都写一个方法，工作繁杂重复，而且，API一旦改动，SDK也要改。
+
+利用完全动态的`__getattr__`，我们可以写出一个链式调用：
+
+```python
+class Chain(object):
+    def __init__(self, path=''):
+        self._path = path
+    
+    def __getattr__(self, path):
+        return Chain('%s/%s' % (self._path, path))
+    
+    def __str__(self):
+        return self._path
+    
+    __repr__=__str__
+```
+
+使用结果如下：
+
+```python
+>>> Chain().status.user.timeline.list
+'/status/user/timeline/list'
+```
+
+这样，无论API怎么变，SDK都可以根据URL实现完全动态的调用，而且，不随API的增加而改变！
+
+#### `__call__`
+
+在类中定义一个`__call__()`方法，可实现直接在实例本身上调用`__call__()`中定义的内容，类似`instance()`。
+
+```python
+class Student(object):
+    def __init__(self, name):
+        self.name = name
+    
+    def __call__(self):
+        print('My name is %s.' % self.name)
+```
+
+调用方式如下：
+
+```python
+>>>s = Student('Michael')
+>>>s()
+My name is Michael.
+```
+
+`__call__()`还可以定义参数。对实例进行直接调用就好比对一个函数进行调用一样，所以完全可以把对象看成函数，把函数看成对象。
+
+要判断一个对象是否是“可调用”对象，可以使用`callable()`函数。
+
+```python
+>>> callable(Student())
+True
+>>> callable(max)
+True
+>>> callable([1, 2, 3])
+False
+```
+
+### 使用枚举类
+
+
+
+### 使用元类
+
+
+
+
+
+
+
+
+
+
+
+
+
