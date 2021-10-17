@@ -1318,11 +1318,11 @@ import sys
 def test():
     args = sys.argv # argv变量，用list存储了命令行的所有参数。
     if len(args)==1:
-        print 'hello, world!'
+        print ('hello, world!')
     elif len(args)==2:
-        print 'Hello, %s' % srgs[1]
+        print ('Hello, %s' % srgs[1])
     else:
-        print 'Too may arguments!'
+        print ('Too may arguments!')
 
 if __name__=='__main__':
     test()
@@ -1435,7 +1435,7 @@ class Student(object):
         self.score = score
         
     def print_score(self):
-        print '%s: %s' % (self.name, self,score)
+        print('%s: %s' % (self.name, self,score))
 ```
 
 ```python
@@ -1486,7 +1486,7 @@ class Student(object):
         self.__score = score
         
     def print_score(self):
-        print '%s: %s' % (self.__name, self.__score)
+        print('%s: %s' % (self.__name, self.__score))
 ```
 
 为了从外部获取name和score，可以给Student类增加`get_name`和`get_score`这样的方法：
@@ -1904,15 +1904,318 @@ False
 
 ### 使用元类
 
+#### type()
+
+动态语言和静态语言最大的不同，就是函数和类的定义，不是编译时定义的，而是在运行时动态创建的。
+
+`type()`函数既可以返回一个对象的类型，又可以创建出新的类型，比如，可以通过`type()`函数创建出`Hello`类，而无需通过``class Hello(object)...`定义：
+
+```python
+>>> def fn(self, name='world'): # 先定义函数
+...     print('Hello, %s.' % name)
+...
+>>> Hello = type('Hello', (object,), dict(hello=fn)) # 创建Hello class
+>>> h = Hello()
+>>> h.hello()
+Hello, world.
+>>> print(type(Hello))
+<class 'type'>
+>>> print(type(h))
+<class '__main__.Hello'>
+```
+
+可见，`Hello`是一个class，它的类型就是`type`，而`h`是一个实例，它的类型就是class `Hello`。
+
+要创建一个class对象，`type()`函数依次传入3个参数：
+
+1. class的名称；
+2. 继承的父类集合，注意Python支持多重继承，如果只有一个父类，别忘了tuple但愿是写法；
+3. class的方法名称与函数绑定，这里把函数`fn`绑定到方法名`hello`上。
+
+通过`type()`函数创建的类和直接写class是完全一样的，因为Python解释器遇到class定义时，仅仅是扫描一下class定义的语法，然后调用`type()`函数创建出class。
+
+#### metaclass
 
 
 
+## 错误、调试和测试
 
+### 错误处理
 
+在程序运行的过程中，如果发生了错误，可以事先约定返回一个错误代码，这样，就可以知道是否有错，以及出错的原因。
 
+所有高级语言通常都内置了一套`try...except...finally...`的错误处理机制，Python也不例外。
 
+#### try
 
+```python
+try:
+    print 'try...'
+    r = 10/0
+    print('result',r)
+except ZeroDivisionError as e:
+    print('except:',e)
+finally:
+    print('finally...')
+print('END')
+```
 
+可以添加多个`except`语句块捕获不同的错误；
 
+`finally`如果有，则一定会被执行（可以没有`finally`语句）。
 
+可以在`except`语句块后面添加`else`语句，如果错误没有发生，会自动执行`else`语句。
 
+Python的错误也是class，所有的错误类型都继承自`BaseException`，使用`Except`时需要注意的时，它不但捕获该类型的错误，还把其子类也“一网打尽”。
+
+使用`try...except`可以跨越多层调用，比如`nain()`调用`foo()`，`foo()`调用`bar()`，结果`bar()`出错了，这时，只要`main()`捕获到了，就可以处理：
+
+```python
+def foo(s):
+    return 10/int(s)
+
+def bar(s):
+    return foo(s) * 2
+
+def main():
+    try:
+        bar('0')
+    except StandardError as e:
+        print('Error:',e)
+    finally:
+        print('finally...')
+```
+
+#### 调用栈
+
+如果错误没有被捕获，它会一直往上抛，最后被Python解释器捕获，并打印一个错误信息，然后程序退出。我们可以根据打印的错误栈进行分析，找到错误的位置。
+
+#### 记录错误
+
+在遇到错误的时候，我们可以把错误堆栈打印出来，然后分析错误，同时，让程序继续执行下去。
+
+Python内置的`logging`模块可以非常容易地记录错误信息：
+
+```python
+# err_logging.py
+
+import logging
+def foo(s):
+    return 10/int(s)
+
+def bar(s):
+    return foo(s)*2
+
+def main():
+    try:
+        bar('0')
+    except Exception as e:
+        logging.exception(e)
+
+main()
+print('END')
+```
+
+同样时出错，但程序打印完错误信息后还会继续执行，并正常退出：
+
+```python
+$ python3 err_logging.py
+ERROR:root:division by zero
+Traceback (most recent call last):
+ File "err_logging.py", line 13, in main
+  bar('0')
+ File "err_logging.py", line 9, in bar
+  return foo(s) * 2
+ File "err_logging.py", line 6, in foo
+  return 10 / int(s)
+ZeroDivisionError: division by zero
+END
+```
+
+#### 抛出错误
+
+Python内置的函数会抛出很多类型的错误，我们自己编写的函数也可以抛出错误。
+
+如果要抛出错误，可以更具需要定义一个错误的class，选择好继承关系，然后，用`raise`语句抛出一个错误是实例：
+
+```python
+# err_raise.py
+class FooError(ValueError):
+    pass
+def foo(s):
+    n = int(s)
+    if n==0:
+        raise FooError('invalid value: %s' % s)
+    return 10/n
+foo('0')
+```
+
+执行，可以跟踪到我们自己定义的错误：
+
+```python
+$ python3 err_raise.py
+Traceback (most recent call last):
+ File "err_throw.py", line 11, in <module>
+  foo('0')
+ File "err_throw.py", line 8, in foo
+  raise FooError('invalid value: %s' % s)
+__main__.FooError: invalid value: 0
+```
+
+还可以在打印错误后，又通过`raise`语句把错误跑出去，便于后续跟踪。
+
+```python
+# err_raise.py
+
+def foo(s):
+    n = int(s)
+    if n==0:
+        raise ValueError('invalid value:%s'%s)
+    return 10/n
+
+def bar():
+    try:
+        foo('0')
+    except ValueError as e:
+        print('ValueError!')
+        raise
+        
+bar()
+```
+
+`raise`语句如果不带参数，就会把当前错误原样抛出。此外，在`except`中`raise`一个Error，还可以把一个错误转化成另一种类型：
+
+```python
+try:
+    10/0
+except ZeroDivisionError:
+    raise ValueError('inputError')
+```
+
+### 调试
+
+#### 使用`print()`打印
+
+第一种方法，用`print()`把可能出问题的变量都打印出来：
+
+```python
+def foo(s):
+    n = int(s)
+    print('>>>n = %d' % n) # 把可能出问题的变量打印出来
+    return 10/n
+
+def main():
+    foo('0')
+
+main()
+```
+
+#### 断言
+
+凡是用`print()`来辅助查看的地方，都可以用断言（assert）来替代：
+
+```python
+def foo(s):
+    n = int(s)
+    assert n!=0, 'n is zero!'
+    return 10/n
+
+def main():
+    foo('0')
+```
+
+`assert`的意思是，表达式`n != 0`应该是`True`，否则，根据程序运行的逻辑，后面的代码肯定会出错。
+
+如果断言失败，`assert`语句会抛出`AssertionError`。
+
+启动Python解释器时可以用`-O`参数来关闭`assert`。
+
+#### logging
+
+`logging`不会抛出错误，而且可以输出到文件。
+
+```python
+import logging
+logging.basicConfig(level=logging.INFP)
+s = '0'
+n = int(s)
+logging.info('n = %d' % n)
+print(10/n)
+```
+
+输出如下：
+
+```python
+$ python err.py
+INFO:root:n = 0
+Traceback (most recent call last):
+  File "err.py", line 8, in <module>
+    print(10 / n)
+ZeroDivisionError: division by zero
+```
+
+`logging`允许你指定记录信息的级别，有`debug`，`info`，`warning`，`error`等几个级别。
+
+#### pdb
+
+第四种方式是启动Python的调试器pdb，让程序单步运行，可以随时查看运行状态。
+
+```python
+# err.py
+s = '0'
+n = int(s)
+print(10/n)
+```
+
+启动：
+
+```python
+$ python -m pdb err.py
+> /Users/michael/Github/learn-python3/samples/debug/err.py(2)<module>()
+-> s = '0'
+```
+
+以参数`-m pdb`启动后，pdb定位到下一步要执行的代码`-> s= '0'`。
+
+输入命令`1`来查看代码；
+
+输入命令`n`单步执行代码；
+
+输入命令`p 变量名`来查看变量；
+
+输入命令`q`结束调试。
+
+#### pdb.set_trace()
+
+这个方法也是pdb，但不需要单步执行，导入`pdb`模块，然后在可能出错的地方放一个`pdb.set_trace()`，就可以设置一个断点。
+
+```python
+# err.py
+import pdb
+
+s = '0'
+n = int(s)
+pdb.set_trace() # 运行到这里自动暂停
+print(10 / n)
+```
+
+运行代码，程序会在`pdb.set_trace()`暂停并进入pdb调试环境，可以用命令`p`查看变量，或者命令`c`继续运行：
+
+```python
+$ python err.py 
+> /Users/michael/Github/learn-python3/samples/debug/err.py(7)<module>()
+-> print(10 / n)
+(Pdb) p n
+0
+(Pdb) c
+Traceback (most recent call last):
+  File "err.py", line 7, in <module>
+    print(10 / n)
+ZeroDivisionError: division by zero
+```
+
+#### IDE
+
+选择一个可以支持调试功能的IDE。
+
+如Visual Studion Code或者Pycharm。
