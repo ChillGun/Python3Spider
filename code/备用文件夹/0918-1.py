@@ -54,13 +54,8 @@ path = 'G:/FFOutput-1/其它/pic/pic105_虎小鹤/'
 #os.chdir(path + title.strip())
 os.chdir(path)
 
-<<<<<<< HEAD
-page_url = "http://www.gogogort.info/html/yazhou/2045"
-page_number = 100   #总页数
-=======
 page_url = "   "
 page_number = 84   #总页数
->>>>>>> 3a26ad59c3d1258fa53b0fcb37862f572a6e87f6
 for i in range(0,page_number):
     #以此获取page页的url并获取网页文件
     if i <2:
